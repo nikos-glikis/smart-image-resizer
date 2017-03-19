@@ -3,9 +3,9 @@
 require_once(__DIR__ . "/vendor/autoload.php");
 use Intervention\Image\ImageManager;
 
-$debug = false;
-$logErrors = false;
-$logFile = 'errors.log';
+require_once('config.php');
+
+
 try
 {
     $currentDir = str_replace($_SERVER['DOCUMENT_ROOT'], "", __DIR__);
@@ -13,6 +13,11 @@ try
     {
         ini_set('display_errors', 'On');
         error_reporting(E_ALL);
+    }
+    else
+    {
+        ini_set('display_errors', 'off');
+
     }
 
     $filename = $_SERVER['REQUEST_URI'];
@@ -61,21 +66,31 @@ try
     {
         throw new \Exception("Invalid sizes.");
     }
-
-    $manager = new ImageManager(array('driver' => 'gd'));
-
-    $img = $manager->make($image);
-
-    $img->fit($width, $height);
-
-    $dir = dirname($lfilename);
-    if (!is_dir($dir))
+    try
     {
-        mkdir($dir, 755, true);
-    }
-    $img->save($lfilename);
+        $manager = new ImageManager(array('driver' => $driver));
 
-    header("Location: " . $_SERVER['REQUEST_URI']);
+        $img = $manager->make($image);
+
+        $img->fit($width, $height);
+
+        $dir = dirname($lfilename);
+        if (!is_dir($dir))
+        {
+            mkdir($dir, 755, true);
+        }
+        $img->save($lfilename);
+    }
+    catch (\Exception $e)
+    {
+        if ($onePixelImageOneError)
+        {
+            file_put_contents($lfilename, base64_decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII="));
+        }
+        throw $e;
+    }
+
+    redirectToSaved();
 }
 catch (Exception $e)
 {
@@ -91,4 +106,10 @@ catch (Exception $e)
     }
     header("HTTP/1.1 500 Internal Server Error");
 }
+
+function redirectToSaved()
+{
+    header("Location: " . $_SERVER['REQUEST_URI']);
+}
+
 ?>
