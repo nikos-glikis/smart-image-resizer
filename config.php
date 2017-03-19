@@ -4,7 +4,7 @@ $debug = false;
 //log errors to $logFile
 $logErrors = false;
 //on error a one pixel image will be saved whenever possible.
-$onePixelImageOneError = true;
+$onePixelImageOneError = false;
 $logFile = 'errors.log';
 
 //driver can be 'gd' or 'imagick'

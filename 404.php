@@ -5,7 +5,6 @@ use Intervention\Image\ImageManager;
 
 require_once('config.php');
 
-
 try
 {
     $currentDir = str_replace($_SERVER['DOCUMENT_ROOT'], "", __DIR__);
