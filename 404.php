@@ -2,10 +2,13 @@
 
 require_once(__DIR__ . "/vendor/autoload.php");
 use Intervention\Image\ImageManager;
+
 $debug = false;
+$logErrors = false;
+$logFile = 'errors.log';
 try
 {
-    
+    $currentDir = str_replace($_SERVER['DOCUMENT_ROOT'], "", __DIR__);
     if ($debug)
     {
         ini_set('display_errors', 'On');
@@ -13,7 +16,7 @@ try
     }
 
     $filename = $_SERVER['REQUEST_URI'];
-    $filename = str_replace("/images/", "", $filename);
+    $filename = str_replace($currentDir . "/", "", $filename);
 
     while (strpos($filename, "/") !== FALSE)
     {
@@ -76,6 +79,12 @@ try
 }
 catch (Exception $e)
 {
+    if ($logErrors)
+    {
+        $actualLink = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+        $message = "Error: " . $e->getMessage() . " Request url: " . $actualLink;
+        file_put_contents($logFile, $message, FILE_APPEND | LOCK_EX);
+    }
     if ($debug)
     {
         die($e->getMessage());

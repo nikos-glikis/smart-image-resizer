@@ -1,2 +1,7 @@
 RewriteEngine on
-ErrorDocument 404 /images/404.php
+#if requested resource isn't a file
+# and isn't a directory
+# then serve local error script
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule .* 404.php [L]
