@@ -1,5 +1,7 @@
 <?php
 /**
+ * This function creates the link to be visited. You should include this in your project.
+ * 
  * @param $url - The url to download.
  * @param int $width - The desired width.
  * @param int $height - The desired height.
